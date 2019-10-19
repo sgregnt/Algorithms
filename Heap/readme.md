@@ -1,5 +1,4 @@
 
-
 # Heap 
 
 Is a partially ordered dataset, 
@@ -8,3 +7,4 @@ its children.
 
 
 
+<img align="center" src="maxheap.png"/>
