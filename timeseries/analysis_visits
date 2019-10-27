@@ -1,0 +1,238 @@
+from matplotlib import pyplot as plt
+import numpy as np
+from scipy import signal
+from scipy.fftpack import fft
+from scipy.signal import blackman
+from scipy.signal import hilbert
+
+filename = "input01.txt"
+with open(filename, 'r') as f:
+    lines = f.read().splitlines()
+
+lines = [float(line) for line in lines]
+lines = np.array(lines[1:] + [np.mean(lines)])
+lines = lines[1:] - lines[:-1]
+print(lines)
+avg = np.mean(lines)
+lines = (lines - avg)/ np.max(lines)
+
+plt.plot(lines[0:50])
+plt.plot(np.abs(np.clip(lines, -0.75, 0.75))[0:50])
+plt.show()
+# 1/0
+
+def serial_corr(wave, lag=1):
+    n = len(wave)
+    y1 = wave[lag:]
+    y2 = wave[:n-lag]
+    corr = np.corrcoef(y1, y2, ddof=0)[0, 1]
+    return corr
+
+def autocorr(wave):
+    lags = range(len(wave)//2)
+    corrs = [serial_corr(wave, lag) for lag in lags]
+    return lags, corrs
+
+t = np.linspace(0, 1, 1000, False)
+f1 = 25
+f2 = 50
+sig1 = np.sin(f1 * 2 * np.pi * t)
+sig2 = np.sin(f2 * 2 * np.pi * t)
+sig = sig1 + sig2
+
+lags, corrs = autocorr(sig)
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(lags, corrs)
+ax1.set_title('Autocorrelation sig (two sinuses)')
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(sig1[0:100])
+plt.plot(sig1[40:100])
+ax1.set_title('Sinus shifted by 40')
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(sig2[0:100])
+plt.plot(sig2[20:100])
+ax1.set_title('Sinus shifted by 20')
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(sig[0:100])
+plt.plot(sig[40:100])
+ax1.set_title('Original signal shifted by 40')
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+lags, corrs  = autocorr(sig)
+plt.plot(lags[5:50], corrs[5:50])
+ax1.set_title('Autocorrelation sig first 50 ticks')
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+lags, corrs = autocorr(lines)
+plt.plot(lags, corrs)
+ax1.set_title('Autocorrelation of visits')
+plt.show()
+
+T = 1.0/500.0
+N = 500
+
+tf = np.linspace(0.0, 1.0/(2.0*T), N//2)
+w = blackman(N)
+ywf = np.abs(fft(lines*w)) # get amplitude
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(tf[1:N//2], 2.0/N * np.abs(ywf[1:N//2]), '-b')
+plt.grid()
+ax1.set_title('FFt transform visits')
+plt.show()
+
+T = 1.0/1000.0
+N = 1000
+
+tf = np.linspace(0.0, 1.0/(2.0*T), N//2)
+w = blackman(N)
+ywf = np.abs(fft(sig*w)) # get amplitude
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+# plt.plot(tf[1:N//2], 2.0/N * np.abs(ywf[1:N//2]), '-b')
+plt.plot(tf[1:80], np.abs(ywf[1:80]), '-b')
+plt.grid()
+ax1.set_title('FFt transform sig')
+plt.show()
+
+
+# how to convert frequency to number of steps?
+# prequency of F, what is the period? 1/F/ T
+F = 20
+print("period of the signal is", 1/F/T)
+
+F = 40
+print("period of the signal is", 1/F/T)
+
+
+# so the period for the signal that I have is
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+lags, corrs = autocorr(lines)
+plt.plot(lags[0:15], corrs[0:15])
+ax1.set_title('Autocorrelation of visits')
+plt.show()
+
+F = 7
+
+# filter weekly trend
+
+
+def butter_bandpass(highcut, fs, order=5, type='high'):
+    nyq = 0.5 * fs
+    high = highcut / nyq
+    b, a = signal.butter(order, high, type, analog=False)
+    return b, a
+
+def butter_bandpass_filter(data, highcut, fs, order=5,type='high'):
+    b, a = butter_bandpass(highcut, fs, order=order, type=type)
+    y = signal.lfilter(b, a, data)
+    return y, b, a
+
+
+# period of 7 has frequency:
+#
+
+hc = 1.0/(7/500) * 0.8
+fs = 500
+res, b, a = butter_bandpass_filter(data = lines,
+                                   highcut = hc,
+                                   fs = fs,
+                                   order = 6,
+                                   type='low')
+
+
+w, h = signal.freqs(b, a)
+plt.semilogx(w, 20 * np.log10(abs(h)))
+plt.title('Butterworth filter frequency response')
+plt.xlabel('Frequency [radians / second]')
+plt.ylabel('Amplitude [dB]')
+plt.margins(0, 0.1)
+plt.grid(which='both', axis='both')
+plt.axvline(100, color='green') # cutoff frequency
+plt.show()
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(res[6:][0:50], 'b')
+plt.plot(lines[0:50], 'k')
+ax1.set_title('Filtered Signal')
+plt.show()
+
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+plt.plot(res[6:], 'b')
+plt.plot(lines, 'c', alpha=0.5)
+ax1.set_title('Filtered Signal')
+plt.show()
+print("Done")
+
+analytic_signal = hilbert(lines)
+amplitude_envelope = np.abs(analytic_signal)
+
+fig = plt.figure()
+ax0 = fig.add_subplot(111)
+ax0.plot(lines, label='signal')
+ax0.plot(amplitude_envelope, label='envelope')
+plt.show()
+
+
+tmp = np.random.rand(2000) * 0.00001
+tmp[0:500] = res
+
+fig = plt.figure()
+ax1 = fig.add_subplot(1, 1, 1)
+lags, corrs = autocorr(tmp)
+plt.plot(lags[10:], corrs[10:])
+ax1.set_title('Autocorrelation of visits')
+plt.show()
+
+
+
+lines_part1 = res[0:356//2 + 1]
+lines_part2 = res[356//2 + 1:356 + 1]
+lines_part3 = res[357:int(1.5 * 356) + 1 ]
+# lines_part4 = lines[int(1.5 * 356) + 1 :]
+
+lines_part1 = (lines_part1 - np.median(lines_part1))
+lines_part2 = (lines_part2[0:150] - np.median(lines_part2[0:150]))
+lines_part3 = (lines_part3 - np.median(lines_part3))
+
+lines_part1 = lines_part1/np.max(lines_part1)
+lines_part2 = lines_part2/np.max(lines_part2)
+lines_part3 = lines_part3/np.max(lines_part3)
+
+plt.plot(lines_part1, 'r')
+plt.plot(lines_part2[0:150], 'b')
+plt.plot(lines_part3, 'g')
+# plt.plot(lines_part4)
+plt.show()
+
+
+change = np.clip(lines - res, -0.2, 0.2)
+plt.plot(change, 'c')
+plt.show()
+
+# change = np.clip(lines - res, -0.2, 0.2)
+plt.plot(change[0:21], 'r')
+plt.show()
+
+
+
+

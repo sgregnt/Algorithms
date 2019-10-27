@@ -1,0 +1,23 @@
+from matplotlib import pyplot as plt
+import numpy as np
+from scipy.fftpack import fft
+from scipy.signal import blackman
+
+filename = "input01.txt"
+with open(filename, 'r') as f:
+    lines = f.read().splitlines()
+
+lines = [float(line) for line in lines]
+lines = np.array(lines[1:])
+avg = np.mean(lines)
+lines = (lines - avg)/ np.max(lines)
+t = np.linspace(0, 1, 500, False)
+T = 1.0/500.0
+N = 500
+
+tf = np.linspace(0.0, 1.0/(2.0*T), N//2)
+w = blackman(N)
+ywf = np.abs(fft(lines*w)) # get amplitude
+plt.plot(tf[1:N//2], 2.0/N * np.abs(ywf[1:N//2]), '-b')
+plt.grid()
+plt.show()

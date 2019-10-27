@@ -1,0 +1,687 @@
+# ----------------------------
+# divisbility by 3 and 5
+# ----------------------------
+
+import math
+l = 75 - 0.5
+r = 75 + 0.5
+z1 = math.log(l)
+z2 = math.log(r)
+
+a = math.log(3)
+b = math.log(5)
+
+y_upper_limit = int(math.floor(z2/b))
+
+count = 0
+for y in range(y_upper_limit + 1):
+    x_lower_bound = int(math.ceil((z1 - y * b)/a))
+    x_upper_bound = int(math.floor((z2 - y * b)/a))
+
+    if x_lower_bound <= x_upper_bound:
+        count += x_upper_bound - x_lower_bound + 1
+
+print(count)
+
+# ----------------------------
+# IP address, try to expend to valid IPv6
+# ----------------------------
+
+class Solution(object):
+    def validIPAddress(self, IP):
+        """
+        :type IP: str
+        :rtype: str
+        """
+
+        a = IP.find(".")
+        b = IP.find(":")
+
+        def piv6_check(chunk):
+
+            # too short or too long
+            if len(chunk) == 0 or len(chunk) > 4:
+                return False
+
+            # number too large
+            for ch in chunk:
+                if not ch.isdigit():
+                    if ch.capitalize() > 'F' or ch.capitalize() < 'A':
+                        return False
+
+            return True
+
+        def piv4_check(chunk):
+
+            # start with leading zero
+            if len(chunk) > 1 and chunk[0] == "0":
+                return False
+
+            # empty or too long
+            if len(chunk) == 0 or len(chunk) > 3:
+                return False
+
+            # number too large
+            for ch in chunk:
+                if not ch.isdigit():
+                    return False
+
+            if int(chunk) > 255:
+                return False
+
+            return True
+
+        # didn't find , or :  or found both
+        if (a > -1 and b > -1) or (a == -1) and (b == -1):
+            return "Neither"
+
+        if a > -1:  # ipv4
+
+            # attempt to parse IPv6
+            chunks = IP.split(".")
+            if len(chunks) != 4:
+                return "Neither"
+
+            for chunk in chunks:
+                if not piv4_check(chunk):
+                    return "Neither"
+
+            return "IPv4"
+
+        if b > -1:  # IPv6
+            # attempt to parse IPv6
+            chunks = IP.split(":")
+            if len(chunks) != 8:
+                return "Neither"
+
+            for chunk in chunks:
+                if not piv6_check(chunk):
+                    return "Neither"
+
+            return "IPv6"
+
+# ----------------------------
+# Can Make Palindrome from Substring
+# ----------------------------
+
+
+# Old naive results
+
+class Solution(object):
+    def canMakePaliQueries(self, s, queries):
+        """
+        :type s: str
+        :type queries: List[List[int]]
+        :rtype: List[bool]
+        """
+        results = []
+
+        def check_distance(string):
+
+            n = len(string)
+            diff = 0
+            myhash = {}
+
+            for ch in string:
+                if ch in myhash:
+                    myhash[ch] += 1
+                else:
+                    myhash[ch] = 1
+
+            for elem in myhash:
+                count = myhash[elem]
+
+                if count % 2 == 1:
+                    diff += 1
+
+            if len(string) % 2 == 1:
+                return diff - 1
+            else:
+                return diff
+
+        for query in queries:
+            start = query[0]
+            end = query[1]
+            k = query[2]
+            dist = check_distance(s[start:end + 1])
+
+            if dist / 2.0 <= k:
+                results.append(True)
+            else:
+                results.append(False)
+
+        return results
+
+# ----------------------------
+# I didn;t noticed you could rearrange the string!
+# ----------------------------
+
+class Solution(object):
+    def canMakePaliQueries(self, s, queries):
+        """
+        :type s: str
+        :type queries: List[List[int]]
+        :rtype: List[bool]
+        """
+
+        n = len(s)
+        dp = [[0] * n for _ in range(n)]
+
+        for i in range(n):
+            dp[i][i] == 0
+
+        for i in range(1, n):
+            for j in range(i):
+                if i - j == 1:
+                    if s[i] != s[j]:
+                        dp[i][j] = 1
+                else:
+                    if s[i] != s[j]:
+                        dp[i][j] = dp[i - 1][j + 1] + 1
+
+        res = []
+        for q in queries:
+            a, b, c = q
+            if dp[b][a] <= c:
+                res.append(True)
+            else:
+                res.append(False)
+        return res
+
+
+class Solution(object):
+    def canMakePaliQueries(self, s, queries):
+        """
+        :type s: str
+        :type queries: List[List[int]]
+        :rtype: List[bool]
+        """
+        n = len(s)
+        prefix = [[0] * 26 for _ in range(n + 1)]
+        a_ind = ord("a")
+
+        for i in range(1, n + 1):
+            ch = s[i - 1]
+            prefix[i] = prefix[i - 1][:]
+            ind = int(ord(ch) - a_ind)
+            prefix[i][ind] += 1
+
+        res = []
+
+        def count_diff(left, right):
+            count = 0
+            for i in range(26):
+                count += (right[i] - left[i]) % 2
+            return count
+
+        for q in queries:
+
+            a, b, c = q
+            left, right = prefix[a], prefix[b + 1]
+            diff = count_diff(left, right)
+
+            if (b - a) % 2 == 1:
+                if diff // 2 <= c:
+                    res.append(True)
+                else:
+                    res.append(False)
+            else:
+                if (diff - 1) // 2 <= c:
+                    res.append(True)
+                else:
+                    res.append(False)
+        return res
+
+a = Solution()
+tmp = "rkzavgdmdgt"
+qq = [[8,10,0]]
+print(a.canMakePaliQueries(tmp, qq))
+
+
+#-------------------------------------
+# Roll dice simulator
+#-------------------------------------
+
+
+class Solution(object):
+    def dieSimulator(self, n, rollMax):
+        """
+        :type n: int
+        :type rollMax: List[int]
+        :rtype: int
+        """
+
+        dp = [[0] * x for x in rollMax]
+
+        # initialize dp
+        for k in range(6):
+            dp[k][0] = 1
+        for k in range(1, n):
+            next_dp = [[0] * n for n in rollMax]
+            roll_sum = [sum(x) for x in dp]
+            total = sum(roll_sum)
+            for i in range(6):
+                for j in range(rollMax[i]):
+                    if j == 0:
+                        next_dp[i][j] = total - roll_sum[i] % (10 ** 9 + 7)
+                    else:
+                        next_dp[i][j] = dp[i][j - 1] % (10 ** 9 + 7)
+            dp = next_dp
+        return sum([sum(x) for x in dp]) % (10 ** 9 + 7)
+
+
+#-----------------------------------------
+# Dice roll simulation
+#-----------------------------------------
+
+if False:
+    n = 2
+    rollMax = [1,1,1,1,1,1]
+
+    n = 2
+    rollMax = [1,1,2,2,2,3]
+
+    n = 5000
+    rollMax = [13,3,12,14,11,11]
+
+
+    import numpy as np
+    dp = [ [[0] * rollMax[i] for i in range(6)] for _ in range(n)]
+    dp = np.array(dp)
+
+    for i in range(6):
+        dp[n-1][i][0] = 1
+
+    for roll in reversed(range(n-1)):
+        for i in range(6):
+            dp[roll][i][0] = (np.sum(np.sum(dp[roll + 1]))- np.sum(np.sum(dp[roll + 1][i][:]))) % (10**9 + 7)
+            for k in range(1, rollMax[i]):
+                dp[roll][i][k] = dp[roll+1][i][k-1] % (10**9 + 7)
+
+    print(np.sum(np.sum(dp[0])) % (10**9 + 7))
+
+
+#-----------------------------------------
+# Even faster
+#-----------------------------------------
+
+if False:
+    n = 2
+    rollMax = [1,1,1,1,1,1]
+    n = 5000
+    rollMax = [13,3,12,14,11,11]
+
+
+    import numpy as np
+    m = max(rollMax)
+    dp = [ [0] * m * 6  for _ in range(n)]
+    dp = np.array(dp)
+
+    for i in range(6):
+        dp[n-1][i * m] = 1
+
+    for roll in reversed(range(n-1)):
+        for i in range(6):
+            dp[roll][i * m] = (np.sum(dp[roll + 1]) - np.sum(dp[roll + 1][i * m: i * m + m])) % (10**9 + 7)
+            for k in range(1, rollMax[i]):
+                dp[roll][i * m + k] = dp[roll+1][i * m + k -1] % (10**9 + 7)
+
+    print(np.sum(dp[0]) % (10**9 + 7))
+
+
+#-----------------------------------------
+# Even faster than faster
+#-----------------------------------------
+
+class Solution(object):
+    def dieSimulator(self, n, rollMax):
+        m = max(rollMax)
+        dp = [[0] * m * 6 for _ in range(n)]
+        # dp = np.array(dp)
+
+        for i in range(6):
+            dp[n - 1][i * m] = 1
+
+        for roll in reversed(range(n - 1)):
+            for i in range(6):
+                dp[roll][i * m] = (sum(dp[roll + 1]) - sum(dp[roll + 1][i * m: i * m + m])) % (10 ** 9 + 7)
+                for k in range(1, rollMax[i]):
+                    dp[roll][i * m + k] = dp[roll + 1][i * m + k - 1] % (10 ** 9 + 7)
+
+        return sum(dp[0]) % (10 ** 9 + 7)
+
+# -----------------------------------------
+# Words chain
+# -----------------------------------------
+
+class Solution(object):
+    def longestStrChain(self, words):
+        dp = {}
+        for w in sorted(words, key=len):
+            dp[w] = max( dp.get(w[:i] + w[i + 1:], 0) + 1 for i in range(len(w)) )
+        return max(dp.values())
+
+
+#-------------------------------------------
+# Turnstil
+#-------------------------------------------
+
+from collections import deque
+exit_q = deque()
+enter_q = deque()
+
+state = 'empty'
+
+times = [0,0,1,5]
+direction = [0,1,1,0]
+
+
+
+
+times =     [0,0,0,10]
+direction = [1,1,0,0]
+
+
+n = len(times)
+
+for i in range(n):
+
+    d = direction[i]
+    t = times[i]
+
+    if d == 0:
+        enter_q.appendleft((t, i))
+    else:
+        exit_q.appendleft((t, i))
+
+clock = 0
+results = [-1] * n
+while exit_q or enter_q:
+
+    if not exit_q: # only enter
+       t, i = enter_q.pop()
+       results[i] = max([t, clock])
+       clock += 1
+       continue
+
+    if not enter_q: # only exit
+        t, i = exit_q.pop()
+        results[i] = max([t, clock])
+        clock += 1
+        continue
+
+    next_exit, i_exit = exit_q[-1]
+    next_enter, i_enter = enter_q[-1]
+
+    if clock < next_exit and clock < next_enter:
+        state = 'empty'
+
+    if state == 'empty':
+        if next_exit <= next_enter:
+            results[i_exit] = max([clock, next_exit])
+            clock += 1
+            next_exit = exit_q.pop()
+            state = 'exit'
+            continue
+
+        else:
+            results[i_enter] = max([clock, next_enter])
+            clock += 1
+            next_exit = enter_q.pop()
+            state = 'enter'
+            continue
+
+    if state == 'exit':
+        if next_exit <= clock or next_exit <= next_enter:
+            results[i_exit] = max([clock, next_exit])
+            clock += 1
+            next_exit = exit_q.pop()
+            state = 'exit'
+            continue
+
+        else:
+            results[i_enter] = max([clock, next_enter])
+            clock += 1
+            next_exit = enter_q.pop()
+            state = 'enter'
+            continue
+
+    if state == 'enter':
+        if next_enter <= clock or next_enter <= next_exit:
+            results[i_enter] = max([clock, next_enter])
+            clock += 1
+            next_exit = enter_q.pop()
+            continue
+
+        else:
+            results[i_exit] = max([clock, next_exit])
+            clock += 1
+            next_exit = exit_q.pop()
+            state = 'exit'
+            continue
+
+print(results)
+
+
+
+def hashedPorts(n, T, packet_id):
+    ans, t = [], 1
+    avail = [0] * n
+    queue = collections.deque()
+    for pid in packet_id:
+        # pop from queue if the port is available
+        while queue and avail[queue[0]] <= t:
+            queue.popleft()
+        # if no ports available, wait until there is one available
+        if len(queue) == n:
+            t = avail[queue.popleft()]
+        # try port until find one available
+        port = pid % n
+        while avail[port] > t:
+            port = (port + 1) % n
+        # send packet, update available time for the port
+        avail[port] = t + T
+        queue.append(port)
+        ans.append(port)
+        t += 1
+
+    return ans
+
+
+#-------------------------------------
+# Array journey
+#-------------------------------------
+
+nums = [10, 2, -10, 5, 20, 10, -1, -50, 1]
+n = len(nums)
+k = 2
+dp = [0] * n
+
+dp[-1] = nums[-1]
+
+for i in reversed(range(n-1)):
+    dp[i] = nums[i] + max(dp[i+j] for j in range(1, k+1) if i+j < n)
+
+print(dp[0])
+
+
+def romanToInt(s):
+    """
+    :type s: str
+    :rtype: int
+    """
+    dict_ = {
+        'I': 1,
+        'IV': 4,
+        'V': 5,
+        'IX': 9,
+        'X': 10,
+        'XL': 40,
+        'L': 50,
+        'XC': 90,
+        'C': 100,
+        'CD': 400,
+        'D': 500,
+        'CM': 900,
+        'M': 1000
+    }
+    result, i = 0, 0
+    while i < len(s):
+        try:
+            result += dict_[s[i] + s[i + 1]]
+            i += 2
+        except (KeyError, IndexError):
+            result += dict_[s[i]]
+            i += 1
+    return result
+
+
+print(romanToInt("III"))
+
+
+#----------------------------------
+# cards
+#----------------------------------
+
+from collections import Counter, Set
+# card parse
+
+def parse_hand(hand):
+
+    hand_unique = list(set(hand))
+    hand_unique.sort(key=Counter(hand).get, reverse=True)
+
+    if len(hand_unique) == 1:
+        type = (3, int(hand_unique[0]))
+
+    if len(hand_unique) == 2:
+        type = (2, int(hand_unique[0]), int(hand_unique[1]))
+
+    if len(hand_unique) == 3:
+        type = (1, int(hand_unique[0]), int(hand_unique[1]), int(hand_unique[2]))
+
+    return type
+
+# p1_hand = parse_hand(hand1)
+# p2_hand = parse_hand(hand2)
+
+# if p1[0] > p2[0]:
+#     return 'P1'
+#
+# if p2[0] > p1[0]:
+#     return 'P2'
+#
+# if p2[1] > p1[1]:
+#     return 'P1'
+#
+# if p2[2] > p1[1]:
+#     return 'P1'
+#
+# if p2[1] > p1[1]:
+#     return 'P1'
+#
+# if p2[2] > p1[1]:
+#     return 'P1'
+
+
+
+#----------------------------------
+# online solution
+#----------------------------------
+
+
+# Q1: Three of a kind > a pair> high card
+# value of each card from 0 to 9
+def p1_win_count(hands):
+    hands1 = hands[:3]
+    hands2 = hands[3:]
+    max_hand1, value1 = calculate_hands(hands1)
+    max_hand2, value2 = calculate_hands(hands2)
+    if max_hand1 > max_hand2:
+        output = -1
+    elif max_hand1 == max_hand2:
+        if value1 > value2:
+            output = -1
+        elif value1 == value2:
+            output = 0
+        else:
+            output = 1
+    else:
+        output = 1
+    return output
+
+
+def calculate_hands(hands):
+    D = {}
+    for i in hands:
+        if i in D:
+            D[i] += 1
+        else:
+            D[i] = 1
+    max_hand = max(D.values())
+    if max_hand > 1:
+        value = [i for i, x in D.items() if x == max_hand]
+        return max_hand, value[0]
+    else:
+        value = max(D.keys())
+        return max_hand, value
+
+
+# hands](https://leetcode.com/problems/couples-holding-hands) = [1,2,2,4,5,6]
+# print(p1_win_count(hands))
+
+
+#--------------------------------
+# Colinearity
+#---------------------------------
+
+from itertools import combinations
+# Q2: detect colinearity
+
+
+def DetectCollinearity(n, pts):
+
+    comb = combinations([i for i in range(n)], 3)
+    output = False
+
+    for indices in list(comb):
+        i,j,k = indices[0], indices[1], indices[2]
+        pt1 = pts[i]
+        pt2 = pts[j]
+        pt3 = pts[k]
+        print(pt1)
+        print(pt2)
+        print(pt3)
+
+        if pt1[0] != pt2[0] and pt2[0]!=pt3[0] and (pt2[1]-pt1[1])*(pt3[0]-pt2[0]) == (pt2[0]-pt1[0])*(pt3[1]-pt2[1]):
+            output = True
+            break
+        elif pt1[0] == pt2[0] and pt2[0] == pt3[0]:
+            output = True
+            break
+        else:continue
+    return output
+
+
+# Throttle
+# not the most efficient implementation
+
+def droppedRequest(RequestTime):
+    D = {}
+    for i in RequestTime:
+        if i in D:
+            D[i] += 1
+        else:
+            D[i] = 1
+        drop_count = 0
+        time = [i for i in D]
+        time.sort()
+        for i in time:
+            drop_count += max(D[i]-3,0)
+            drop_count += max(sum([D[i] for i in range(max(min(time), i-9), i+1) if i in D]) - 20, 0)
+            drop_count += max(sum([D[i] for i in range(max(min(time), i-59), i+1) if i in D]) - 60, 0)
+    return drop_count
+
+RequestTime = [1,1,1,1,1,2,2,2,3,3,3,4,4,4,11,11,11,6,6,6,5,5,5]
+drop_count = droppedRequest(RequestTime)
+print(drop_count)

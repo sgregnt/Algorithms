@@ -165,7 +165,7 @@ def heap_sort(a):
 
     for i in reversed(range(n)):
         a[0], a[i] = a[i], a[0]
-        max_bubble_down(a, 1, i)
+        max_bubble_down(a, 1, i )
 
 
 
