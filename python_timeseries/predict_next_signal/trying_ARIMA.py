@@ -16,14 +16,7 @@ with open(filename, 'r') as f:
 
 lines = [float(line) for line in lines]
 values = lines[1:]
-
 n = len(values)
-# n = int(input())
-# values = np.zeros((n, 1))
-
-# for i in range(n):
-#     values[i] = int(input())
-
 
 dtrange = pd.date_range('2012-10-01', periods=n)
 

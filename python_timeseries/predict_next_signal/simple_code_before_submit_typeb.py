@@ -7,9 +7,6 @@ matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 
 
-# lines = []
-# for line in fileinput.input():
-#     lines.append(int(line.strip()))
 filename = "input01.txt"
 with open(filename, 'r') as f:
     lines = f.read().splitlines()
@@ -56,9 +53,7 @@ average_trend = np.mean(np.array(past_trends), axis=0)
 dates = [int(N)-1]
 
 last_stab = first_0_day_before_date(dates, days)
-
 final_part = lines[last_stab[0]:]
-
 extension = [final_part[0]]
 
 for i in range(1, len(average_trend)):
@@ -71,7 +66,6 @@ res = []
 for i in range(N, N + 30):
     res.append(extended_lines[i])
     print(extended_lines[i])
-
 
 plt.plot(extended_lines)
 plt.plot(original_lines)

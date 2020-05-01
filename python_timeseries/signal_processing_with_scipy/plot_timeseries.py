@@ -1,8 +1,8 @@
 import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
-from scipy.signal import butter, lfilter, freqz
-filename = "input01.txt"
+from scipy.signal import butter, lfilter, freqz, sosfilt
+filename = "../predict_next_signal/input01.txt"
 with open(filename, 'r') as f:
     lines = f.read().splitlines()
 
@@ -12,7 +12,6 @@ lines = np.array(lines[1:])
 avg = np.mean(lines)
 lines = lines - avg
 from sklearn.decomposition import SparseCoder
-
 
 def butter_lowpass(cutoff, fs, order=5):
     nyq = 0.5 * fs
@@ -86,8 +85,8 @@ ax1.plot(t, sig)
 ax1.set_title('10 Hz and 20 Hz sinusoids')
 ax1.axis([0, 1, -2, 2])
 
-sos = signal.butter(10, 15, 'hp', fs=1000, output='sos')
-filtered = signal.sosfilt(sos, sig)
+sos = butter(10, 15, 'hp', fs=1000, output='sos')
+filtered = sosfilt(sos, sig)
 ax2.plot(t, filtered)
 ax2.set_title('After 15 Hz high-pass filter')
 ax2.axis([0, 1, -2, 2])
@@ -101,17 +100,15 @@ import matplotlib.pyplot as plt
 plt.plot(xf, 2.0/N * np.abs(yf[0:N//2]))
 plt.grid()
 plt.show()
-1/0
+
 from scipy.fftpack import fft
 yf = fft(corrs)
 plt.plot(yf)
 plt.show()
-1/0
-from distutils.version import LooseVersion
 
+from distutils.version import LooseVersion
 import numpy as np
 import matplotlib.pyplot as plt
-
 from sklearn.decomposition import SparseCoder
 
 def ricker_function(resolution, center, width):
@@ -122,7 +119,6 @@ def ricker_function(resolution, center, width):
          * np.exp((-(x - center) ** 2) / (2 * width ** 2)))
     return x
 
-
 def ricker_matrix(width, resolution, n_components):
     """Dictionary of Ricker (Mexican hat) wavelets"""
 
@@ -132,7 +128,6 @@ def ricker_matrix(width, resolution, n_components):
         D[i] = ricker_function(resolution, center, width)
     D /= np.sqrt(np.sum(D ** 2, axis=1))[:, np.newaxis]
     return D
-
 
 resolution = 500
 subsampling = 3  # subsampling factor
@@ -146,7 +141,7 @@ D_fixed = ricker_matrix(width=width, resolution=resolution,
 D_multi = np.r_[tuple(ricker_matrix(width=w, resolution=resolution,
                       n_components=n_components // 5)
                 for w in (10, 50, 100, 500, 1000))]
-y= lines
+y= lines[0:500]
 
 # List the different sparse coding methods in the following format:
 # (title, transform_algorithm, transform_alpha,

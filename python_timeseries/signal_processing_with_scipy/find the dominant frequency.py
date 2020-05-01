@@ -10,7 +10,7 @@ lines = [float(line) for line in lines]
 lines = np.array(lines[1:])
 avg = np.mean(lines)
 lines = (lines - avg)/ np.max(lines)
-t = np.linspace(0, 1, 500, False)
+t = np.linspace(0, 1, len(lines), False)
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
@@ -23,7 +23,6 @@ plt.plot(t[0:50], lines[0:50])
 ax1.set_title("Zoom in first 50 samples")
 plt.show()
 
-1/0
 
 def butter_bandpass(highcut, fs, order=5):
     nyq = 0.5 * fs

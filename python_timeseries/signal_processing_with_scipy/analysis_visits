@@ -19,7 +19,6 @@ lines = (lines - avg)/ np.max(lines)
 plt.plot(lines[0:50])
 plt.plot(np.abs(np.clip(lines, -0.75, 0.75))[0:50])
 plt.show()
-# 1/0
 
 def serial_corr(wave, lag=1):
     n = len(wave)
@@ -109,15 +108,14 @@ plt.grid()
 ax1.set_title('FFt transform sig')
 plt.show()
 
-
 # how to convert frequency to number of steps?
 # prequency of F, what is the period? 1/F/ T
+
 F = 20
 print("period of the signal is", 1/F/T)
 
 F = 40
 print("period of the signal is", 1/F/T)
-
 
 # so the period for the signal that I have is
 
@@ -132,7 +130,6 @@ F = 7
 
 # filter weekly trend
 
-
 def butter_bandpass(highcut, fs, order=5, type='high'):
     nyq = 0.5 * fs
     high = highcut / nyq
@@ -144,10 +141,8 @@ def butter_bandpass_filter(data, highcut, fs, order=5,type='high'):
     y = signal.lfilter(b, a, data)
     return y, b, a
 
-
 # period of 7 has frequency:
 #
-
 hc = 1.0/(7/500) * 0.8
 fs = 500
 res, b, a = butter_bandpass_filter(data = lines,
@@ -155,7 +150,6 @@ res, b, a = butter_bandpass_filter(data = lines,
                                    fs = fs,
                                    order = 6,
                                    type='low')
-
 
 w, h = signal.freqs(b, a)
 plt.semilogx(w, 20 * np.log10(abs(h)))
@@ -174,7 +168,6 @@ plt.plot(lines[0:50], 'k')
 ax1.set_title('Filtered Signal')
 plt.show()
 
-
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
 plt.plot(res[6:], 'b')
@@ -192,7 +185,6 @@ ax0.plot(lines, label='signal')
 ax0.plot(amplitude_envelope, label='envelope')
 plt.show()
 
-
 tmp = np.random.rand(2000) * 0.00001
 tmp[0:500] = res
 
@@ -203,11 +195,9 @@ plt.plot(lags[10:], corrs[10:])
 ax1.set_title('Autocorrelation of visits')
 plt.show()
 
-
-
 lines_part1 = res[0:356//2 + 1]
 lines_part2 = res[356//2 + 1:356 + 1]
-lines_part3 = res[357:int(1.5 * 356) + 1 ]
+lines_part3 = res[357:int(1.5 * 356) + 1]
 # lines_part4 = lines[int(1.5 * 356) + 1 :]
 
 lines_part1 = (lines_part1 - np.median(lines_part1))
@@ -221,7 +211,6 @@ lines_part3 = lines_part3/np.max(lines_part3)
 plt.plot(lines_part1, 'r')
 plt.plot(lines_part2[0:150], 'b')
 plt.plot(lines_part3, 'g')
-# plt.plot(lines_part4)
 plt.show()
 
 
