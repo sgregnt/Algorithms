@@ -134,5 +134,36 @@ print(max_len)
 
 
 # ------------------------------------
-#  expend form the center
+#  another implementation from a different filed copied here
 # ------------------------------------
+
+class Solution(object):
+    def longestPalindrome(self, s):
+
+        n = len(s)
+        dp =  [ [0] * n for _ in range(len(s))]
+
+        for i in range(n):
+            dp[i][i] = 1
+
+        max_str = s[0]
+        max_val = 1
+
+        for i in range(1, n):
+            for j in range(i):
+                if s[j] == s[i]:
+                    if  (i - j) > 2:
+                        if dp[i-1][j+1] > 0:
+                            dp[i][j] = dp[i-1][j+1] + 2
+                    else:
+                        dp[i][j] = i - j + 1
+
+                if max_val < dp[i][j]:
+                    max_val = dp[i][j]
+                    max_str = s[j: i+1]
+
+        return max_str
+
+
+a = Solution()
+print(a.longestPalindrome("cbbd"))

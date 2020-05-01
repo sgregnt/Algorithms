@@ -1,5 +1,5 @@
 #--------------------------------
-# Colinearity
+# colinearity
 #---------------------------------
 
 from itertools import combinations
