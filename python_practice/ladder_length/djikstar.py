@@ -5,7 +5,6 @@ class Solution(object):
     def ladderLength(self, beginWord, endWord, wordList):
 
         auxlist = {}
-
         wordList =  [list(word) for word in wordList]
 
         for word in wordList:
