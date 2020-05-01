@@ -1,29 +1,22 @@
+#Leetcode 31. Next Permuation
+#Implement next permutation, which rearranges numbers into the lexicographically next greater #permutation of numbers.
+
+#If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+
+#The replacement must be in-place and use only constant extra memory.
+
+#Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+
+#1,2,3 → 1,3,2
+#3,2,1 → 1,2,3
+#1,1,5 → 1,5,1
+
+
 import bisect
 
 class Solution(object):
     def nextPermutation(self, nums):
-                # """
-                # :type nums: List[int]
-                # :rtype: None Do not return anything, modify nums in-place instead.
-                # """
-                #
-                # if not nums:
-                #     return []
-                #
-                # n = len(nums)
-                # max_so_far = nums[0]
-                #
-                # for j in range(n):
-                #     max_so_far = nums[0]
-                #     for i in range(n-j):
-                #         if max_so_far < num[i]:
-                #             max_so_far = num[i]
-                #             index = i
-                #
-                #     if nums[n-j] != max_so_far:
-                #
-                # nums = list(reversed(nums))
-                # return nums
+       
         def reverse(alist, left, right):
             # intializing pointers
             # left = 0
@@ -59,8 +52,6 @@ class Solution(object):
             swap_ind1 = i
 
             stil_large = float('inf')
-
-            # can do bisection
 
             j = len(nums)
             while j > i:
