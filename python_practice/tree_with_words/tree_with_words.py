@@ -95,8 +95,8 @@ class MapSum(object):
         return res
 
 a = MapSum()
-a.insert("apple",3)
-a.insert("app",10)
+a.insert("apple", 3)
+a.insert("app", 10)
 print(a.sum("apple"))
 print(a.c_dict)
 a.insert("appx",3)
